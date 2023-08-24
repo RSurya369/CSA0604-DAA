@@ -1,0 +1,41 @@
+#include <stdio.h>
+#include <limits.h>
+#define MAX_KEYS 5
+int sumOfFreq(int freq[], int i, int j) {
+    int sum = 0;
+    for (int k = i; k <= j; k++) {
+        sum += freq[k];
+    }
+    return sum;
+}
+int optimalBST(int keys[], int freq[], int n) {
+    int dp[MAX_KEYS][MAX_KEYS];
+    for (int i = 0; i < n; i++) {
+        dp[i][i] = freq[i];
+    }
+    for (int length = 2; length <= n; length++) {
+        for (int i = 0; i <= n - length + 1; i++) {
+            int j = i + length - 1;
+            dp[i][j] = INT_MAX;
+            for (int r = i; r <= j; r++) {
+                int cost = ((r > i) ? dp[i][r - 1] : 0) +
+                           ((r < j) ? dp[r + 1][j] : 0) +
+                           sumOfFreq(freq, i, j);
+
+                if (cost < dp[i][j]) {
+                    dp[i][j] = cost;
+                }
+            }
+        }
+    }
+
+    return dp[0][n - 1];
+}
+int main() {
+    int keys[MAX_KEYS] = {10, 12, 20, 40, 45};
+    int freq[MAX_KEYS] = {34, 8, 50, 23, 12};
+    int n = sizeof(keys) / sizeof(keys[0]);
+    int result = optimalBST(keys, freq, n);
+    printf("Optimal BST cost: %d\n", result);
+    return 0;
+}
