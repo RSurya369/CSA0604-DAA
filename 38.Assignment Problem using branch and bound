@@ -1,0 +1,34 @@
+#include <stdio.h>
+#include <limits.h>
+#define N 4
+int costMatrix[N][N] = {
+    {9, 2, 7, 8},
+    {6, 4, 3, 7},
+    {5, 8, 1, 8},
+    {7, 6, 9, 4}
+};
+int assigned[N];
+int minCost = INT_MAX;
+void solveAssignment(int row, int col, int totalCost) {
+    if (row == N) {
+        if (totalCost < minCost) {
+            minCost = totalCost;
+            for (int i = 0; i < N; i++) {
+                printf("Assign task %d to worker %d\n", i + 1, assigned[i] + 1);
+            }
+            printf("Total cost: %d\n", minCost);
+        }
+        return;
+    }
+    for (int j = 0; j < N; j++) {
+        if (col & (1 << j)) {
+            continue;
+        }
+        assigned[row] = j;
+        solveAssignment(row + 1, col | (1 << j), totalCost + costMatrix[row][j]);
+    }
+}
+int main() {
+    solveAssignment(0, 0, 0);
+    return 0;
+}
