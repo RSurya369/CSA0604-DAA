@@ -1,0 +1,64 @@
+#include <stdio.h>
+#include <stdlib.h>
+#define MAX_CONTAINERS 100
+#define MAX_ITEMS 100
+typedef struct {
+    int size;
+    int container;
+} Item;
+int compare(const void *a, const void *b) {
+    return ((Item *)b)->size - ((Item *)a)->size;
+}
+void packItems(Item items[], int numItems, int containerCapacity) {
+    int containersUsed = 0;
+    Item containers[MAX_CONTAINERS][MAX_ITEMS];
+    for (int i = 0; i < numItems; i++) {
+        int j;
+        for (j = 0; j < containersUsed; j++) {
+            int totalSize = 0;
+            for (int k = 0; k < i; k++) {
+                if (containers[j][k].container == 1) {
+                    totalSize += containers[j][k].size;
+                }
+            }
+            if (totalSize + items[i].size <= containerCapacity) {
+                containers[j][i] = items[i];
+                items[i].container = 1;
+                break;
+            }
+        }
+        if (j == containersUsed) {
+            containers[containersUsed][i] = items[i];
+            items[i].container = 1;
+            containersUsed++;
+        }
+    }
+    printf("Items packed into containers:\n");
+    for (int i = 0; i < containersUsed; i++) {
+        printf("Container %d: ", i + 1);
+        for (int j = 0; j < numItems; j++) {
+            if (containers[i][j].container == 1) {
+                printf("%d ", containers[i][j].size);
+            }
+        }
+        printf("\n");
+    }
+    printf("Total containers used: %d\n", containersUsed);
+}
+int main() {
+    int numItems;
+    int containerCapacity;
+    Item items[MAX_ITEMS];
+    printf("Enter the number of items: ");
+    scanf("%d", &numItems);
+    printf("Enter the capacity of each container: ");
+    scanf("%d", &containerCapacity);
+    printf("Enter the sizes of the items:\n");
+    for (int i = 0; i < numItems; i++) {
+        scanf("%d", &items[i].size);
+        items[i].container = 0;
+    }
+    qsort(items, numItems, sizeof(Item), compare);
+    packItems(items, numItems, containerCapacity);
+    return 0;
+}
